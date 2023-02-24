@@ -1,0 +1,78 @@
+<div class="main row">
+  <mat-card>
+    <div class="main-container">
+      <div class="header">
+        <h1>TODO LIST <i class="fa fa-pencil"></i></h1>
+      </div>
+      <div class="inputDiv" style="padding-top: 10px;">
+        <mat-form-field style="width: 80%!important;">
+          <input matInput type="text" placeholder="New Task" [(ngModel)]="taskTitle" (keyup.enter)="addTask()">
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="addTask()">Add</button>
+      </div>
+
+      <div class="example-container mat-elevation-z8">
+        <mat-table #table [dataSource]="dataSource">
+
+          <ng-container matColumnDef="completed">
+            <mat-header-cell *matHeaderCellDef> Completed</mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              <input type="checkbox" [(ngModel)]="element.completed" (click)="completedTask(element)">
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="title">
+            <mat-header-cell *matHeaderCellDef> Title </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              <div *ngIf="!element.editing else editingTask" (dblclick)="toggleEdit(element)"
+                [ngClass]="{completed: element.completed}">{{element.title}}</div>
+              <ng-template #editingTask>
+                <input type="text" [(ngModel)]="element.title" (blur)="doneEditing(element)"
+                  (keyup.enter)="editTask(element)" (keyup.esc)="cancelEditing(element)" autofocus>
+              </ng-template>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="editing">
+            <mat-header-cell *matHeaderCellDef> Edit </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              <div *ngIf="!element.editing;"><button [ngClass]="{disabled: element.completed}"
+                  class="btn btn-success listBtn" (click)="toggleEdit(element)"><mat-icon>edit</mat-icon></button>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="delete">
+            <mat-header-cell *matHeaderCellDef> Delete </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              <button class="btn btn-danger listBtn" (click)="deleteTask(element.id)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        </mat-table>
+      </div>
+      <div class="content">
+
+        <div *ngIf="remaining() === 0">
+          <div @fade>
+            <h5>All task has been completed.</h5>
+          </div>
+        </div>
+        <hr>
+        <div class="info">
+          <div>{{ remaining()}} uncompleted tasks</div>
+        </div>
+        <div *ngIf="atleastOneCompleted()">
+          <button class="btn btn-warning btn-block" (click)="deleteCompletedTask()">Clear Completed</button>
+          <div class="alert alert-warning">You've selected an item</div>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+
+</div>
